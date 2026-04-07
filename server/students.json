@@ -1,0 +1,122 @@
+[
+  {
+    "idNumber": "1",
+    "firstName": "Constantino",
+    "middleName": "Veneracion",
+    "lastName": "Balesteros",
+    "course": "BSCE",
+    "year": "2"
+  },
+  {
+    "idNumber": "5",
+    "firstName": "Esmeralda",
+    "middleName": "Santos",
+    "lastName": "Quintos",
+    "course": "BSEE",
+    "year": "5"
+  },
+  {
+    "idNumber": "11",
+    "firstName": "Panfilo",
+    "middleName": "Buenavista",
+    "lastName": "Constantino",
+    "course": "BSCS",
+    "year": "3"
+  },
+  {
+    "idNumber": "36",
+    "firstName": "Leopoldo",
+    "middleName": "Hernandez",
+    "lastName": "Gallardo",
+    "course": "BSEE",
+    "year": "2"
+  },
+  {
+    "idNumber": "38",
+    "firstName": "Valentino",
+    "middleName": "Zamora",
+    "lastName": "Velasquez",
+    "course": "BSCE",
+    "year": "3"
+  },
+  {
+    "idNumber": "42",
+    "firstName": "Cecilia",
+    "middleName": "Garces",
+    "lastName": "Valiente",
+    "course": "BSEE",
+    "year": "1"
+  },
+  {
+    "idNumber": "49",
+    "firstName": "Presencia",
+    "middleName": "Navarro",
+    "lastName": "Fernandez",
+    "course": "BSMT",
+    "year": "2"
+  },
+  {
+    "idNumber": "51",
+    "firstName": "Alejandro",
+    "middleName": "Molina",
+    "lastName": "Ortega",
+    "course": "BSEE",
+    "year": "3"
+  },
+  {
+    "idNumber": "58",
+    "firstName": "Inocencio",
+    "middleName": "Castro",
+    "lastName": "Ramos",
+    "course": "BSCS",
+    "year": "1"
+  },
+  {
+    "idNumber": "62",
+    "firstName": "Sebastian",
+    "middleName": "Delgado",
+    "lastName": "Buenavista",
+    "course": "BSCE",
+    "year": "2"
+  },
+  {
+    "idNumber": "63",
+    "firstName": "Josefa",
+    "middleName": "Martinez",
+    "lastName": "Torres",
+    "course": "BSCE",
+    "year": "2"
+  },
+  {
+    "idNumber": "65",
+    "firstName": "Zenaida",
+    "middleName": "Castro",
+    "lastName": "Romero",
+    "course": "BSIT",
+    "year": "1"
+  },
+  {
+    "idNumber": "68",
+    "firstName": "Corazon",
+    "middleName": "Blanco",
+    "lastName": "Buenaventura",
+    "course": "BSEE",
+    "year": "4"
+  },
+  {
+    "idNumber": "69",
+    "firstName": "Inocencio",
+    "middleName": "Concepcion",
+    "lastName": "Vallador",
+    "course": "BSMT",
+    "year": "2"
+  },
+  {
+    "idNumber": "70",
+    "firstName": "Pedro",
+    "middleName": "Montes",
+    "lastName": "Acosta",
+    "course": "BSIT",
+    "year": "4"
+  }
+]

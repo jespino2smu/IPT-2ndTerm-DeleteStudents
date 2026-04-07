@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Firstname M. Lastname",
+    "email": "Name@mail.com",
+    "password": "Password"
+  },
+  {
+    "name": "Cynthia Balesteros",
+    "email": "cynthia_balesteros@mail.com",
+    "password": "cynth_key_board"
+  },
+  {
+    "name": "Esmeralda Concepcion",
+    "email": "esme2concep@mail.com",
+    "password": "eme_eme"
+  },
+  {
+    "name": "Pedrino Resurreccion",
+    "email": "ped_res@mail.com",
+    "password": "BastaBasta"
+  },
+  {
+    "name": "Cecilio Buenavista",
+    "email": "cevista@mail.com",
+    "password": "BuenoManoPo"
+  },
+  {
+    "name": "Leopoldo Cervantes",
+    "email": "leop_cerv@mail.com",
+    "password": "LeoLeoCervantes"
+  }
+]
