@@ -20,7 +20,9 @@ function AddStudents() {
         middleName: "",
         lastName: "",
         course: "",
-        year: ""};
+        year: "",
+        image: null};
+
 
     const validate = () => {
         let tempErrors = emptyStudentInfo;
@@ -64,6 +66,10 @@ function AddStudents() {
 
     const [inputValues, setInputValues] = useState(emptyStudentInfo);
     const [fieldErrorText, setFieldErrorText] = useState(emptyStudentInfo);
+    const [imageUrl, setImageUrl] = useState("");
+    
+
+    const [preview, setPreview] = useState(null);
 
     const [editIndex, setEditIndex] = useState(null);
     const [students, setStudents] = useState([]);
@@ -252,7 +258,12 @@ function AddStudents() {
                 middleName: inputValues.middleName,
                 lastName: inputValues.lastName,
                 course: inputValues.course,
-                year: inputValues.year
+                year: inputValues.year,
+                image: inputValues.image
+            }, {
+                headers: {
+                "Content-Type": "multipart/form-data"
+                }
             });
             displayStudentInfo();
             alert("Student added!");
@@ -279,6 +290,12 @@ function AddStudents() {
     useEffect(() => {
         fetchStudents();
     }, []);
+
+    useEffect(() => {
+        return () => {
+            if (preview) URL.revokeObjectURL(preview);
+        };
+    }, [preview]);
 
 
     async function handleUpdateStudent() {
@@ -324,15 +341,29 @@ function AddStudents() {
         
     }
 
-    
     const changeInputValue = (e) => {
-        const { id, value } = e.target;
+        const { id, value, files } = e.target;
 
-        alert(value + ", course: " + inputValues.course);
-        setInputValues({
-            ...inputValues,
-            [e.target.id]: e.target.value
-        });
+        //alert(value + ", course: " + inputValues.course);
+
+        if (id === "image") { 
+            const file = files[0];
+
+            setInputValues({
+                ...inputValues,
+                image: file
+            });
+            
+            if (file) {
+                setPreview(URL.createObjectURL(file));
+            }
+
+        } else {
+            setInputValues({
+                ...inputValues,
+                [e.target.id]: e.target.value
+            });
+        }
     };
     
     const changeCourse = (value) => {
@@ -439,29 +470,6 @@ function AddStudents() {
                         ))}
                         </TextField>
 
-
-                    {/* <TextField id="course" label="Course" variant="outlined" fullWidth margin="normal"
-                        select
-                        required
-                        value={inputValues.course}
-                        onChange={changeInputValue}
-                        sx={{textAlign: 'left'}}
-                        error={!!errors.course}
-                        helperText={errors.course}>
-
-                        {courseAcronyms.map((c, index) => (
-                            <MenuItem value={c}>{courses[index]}</MenuItem>
-                        ))}
-                    </TextField> */}
-
-                    {/*<TextField id="course" label="Course" variant="outlined" fullWidth margin="normal"
-                        required
-                        error={fieldErrorText.course !== ""}
-                        helperText={fieldErrorText.course}
-                        value={inputValues.course}
-                        onChange={(e) => changeInputValue("course", e.target.value)}
-                        />*/}
-
                     <TextField id="year" label="Year" variant="outlined" fullWidth margin="normal"
                         required
                         // type="number"
@@ -474,6 +482,30 @@ function AddStudents() {
                         error={!!errors.year}
                         helperText={errors.year}
                         />
+
+                    {preview && (
+                        <Box sx={{ mt: 2 }}>
+                            <Typography>Image Preview:</Typography>
+                            <img
+                            src={preview}
+                            alt="preview"
+                            style={{ width: "100%", maxHeight: 200, objectFit: "cover" }}
+                            />
+                        </Box>
+                    )}
+
+                    <Button variant="contained" component="label"
+                        sx={{ mt: 2 }}>
+                        Upload Image
+                        <input
+                            id="image" 
+                            type="file"
+                            name="image"
+                            hidden
+                            accept="image/*"
+                            onChange={changeInputValue}
+                        />
+                    </Button>
 
                     {/* <Button
                         type="submit"
