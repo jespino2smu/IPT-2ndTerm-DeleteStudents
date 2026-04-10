@@ -12,6 +12,7 @@ import {
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
 function AddStudents() {
+    const [errors, setErrors] = useState([]); 
 
     const emptyStudentInfo = {
         idNumber: "",
@@ -20,6 +21,46 @@ function AddStudents() {
         lastName: "",
         course: "",
         year: ""};
+
+    const validate = () => {
+        let tempErrors = emptyStudentInfo;
+
+        if (inputValues.idNumber.trim() === "") {
+            tempErrors.idNumber = "Field is required";
+        } else if (!/^\d+$/.test(inputValues.idNumber)) {
+            tempErrors.idNumber = "Must be a whole number";
+        }   
+
+        if (inputValues.firstName.trim() === "") {
+            tempErrors.firstName = "Field is required";
+        } else if (!/^[A-Za-z\s-]+$/.test(inputValues.firstName)) {
+            tempErrors.firstName = "Can only contain letters, spaces, and dash";
+        }
+
+        if (!/^[A-Za-z\s-]+$/.test(inputValues.middleName)) {
+            tempErrors.middleName = "Can only contain letters, spaces, and dash";
+        }
+
+        
+        if (inputValues.lastName.trim() === "") {
+            tempErrors.lastName = "Field is required";
+        } else if (!/^[A-Za-z\s-]+$/.test(inputValues.lastName)) {
+            tempErrors.lastName = "Can only contain letters, spaces, and dash";
+        }
+
+        if (inputValues.course.trim() === "") {
+            tempErrors.course = "Field is required";
+        }
+
+        if (inputValues.year.trim() === "") {
+            tempErrors.year = "Field is required";
+        } else if (!/^[1-5]$/.test(inputValues.year)) {
+            tempErrors.year = "Must be an integer between 1 and 5";
+        }
+
+        setErrors(tempErrors);
+        return Object.keys(tempErrors).length === 0;
+    };
 
     const [inputValues, setInputValues] = useState(emptyStudentInfo);
     const [fieldErrorText, setFieldErrorText] = useState(emptyStudentInfo);
@@ -94,18 +135,21 @@ function AddStudents() {
     }
     // ==============
 
-    const changeInputValue = (key, value) => {
-        if (key === "idNumber") {
-            value = value.replace(/\D/g, ''); 
-        }
 
-        setInputValues(prevInputValue => ({
-            ...prevInputValue,
-            [key]: value
-        }));
+    // ==============
+
+    // const changeInputValue = (key, value) => {
+    //     if (key === "idNumber") {
+    //         value = value.replace(/\D/g, ''); 
+    //     }
+
+    //     setInputValues(prevInputValue => ({
+    //         ...prevInputValue,
+    //         [key]: value
+    //     }));
         
-        displayEmptyError(key, value);
-    };
+    //     displayEmptyError(key, value);
+    // };
     
     const displayEmptyError = (key, value) => {
         if (key === "middleName") {
@@ -191,6 +235,11 @@ function AddStudents() {
     }
 
     async function handleAddStudent() {
+        if (!validate()) {
+            //console.log("Form Data:", form);
+            return;
+        }
+        alert("Run!");
         try {
             // if (!noInputErrors()) {
             //     clearStudentInfo();
@@ -264,17 +313,34 @@ function AddStudents() {
         setEditIndex(index);
     }
 
-    function handleCourse(condition, value) {
-        if (condition === "BLIS") {
-            return "Bachelor in " + courses[courseAcronyms.indexOf(value)];
+
+    
+    function handleCourse(selected) {
+        if (inputValues.course === "BLIS") {
+            return "Bachelor in " + courses[courseAcronyms.indexOf(selected)];
         } else {
-            return "Bachelor of Science in " + courses[courseAcronyms.indexOf(value)];
+            return "Bachelor of Science in " + courses[courseAcronyms.indexOf(selected)];
         }
+        
     }
 
+    
+    const changeInputValue = (e) => {
+        const { id, value } = e.target;
 
-
-
+        alert(value + ", course: " + inputValues.course);
+        setInputValues({
+            ...inputValues,
+            [e.target.id]: e.target.value
+        });
+    };
+    
+    const changeCourse = (value) => {
+        setInputValues(prevInputValue => ({
+            ...prevInputValue,
+            course: value
+        }));
+    };
 
     return (
         <>
@@ -316,53 +382,77 @@ function AddStudents() {
                     // onSubmit={handleAddStudent}
                     >
 
-                    <TextField id="id-number" label="ID Number" variant="outlined" fullWidth margin="normal"
+                    <TextField id="idNumber" label="ID Number" variant="outlined" fullWidth margin="normal"
                         required
-                        type="number"
-                        error={fieldErrorText.idNumber !== ""}
-                        helperText={fieldErrorText.idNumber}
+                        // type="number"
                         value={inputValues.idNumber}
-                        onChange={(e) => changeInputValue("idNumber", e.target.value)}
-                        InputProps={{ inputProps: { min: 1 } }}
+                        onChange={changeInputValue}
+
+                        error={!!errors.idNumber}
+                        helperText={errors.idNumber}
                         />
 
-                    <TextField id="first-name" label="First Name" variant="outlined" fullWidth margin="normal"
+                    <TextField id="firstName" label="First Name" variant="outlined" fullWidth margin="normal"
                         required
-                        error={fieldErrorText.firstName !== ""}
-                        helperText={fieldErrorText.firstName}
                         value={inputValues.firstName}
-                        onChange={(e) => changeInputValue("firstName", e.target.value)}
+                        onChange={changeInputValue}
+                        
+                        error={!!errors.firstName}
+                        helperText={errors.firstName}
                         />
 
-                    <TextField id="middle-name" label="Middle Name" variant="outlined" fullWidth
+                    <TextField id="middleName" label="Middle Name" variant="outlined" fullWidth
                         value={inputValues.middleName}
-                        onChange={(e) => changeInputValue("middleName", e.target.value)}
+                        onChange={changeInputValue}
+                        
+                        error={!!errors.middleName}
+                        helperText={errors.middleName}
                         />
 
-                    <TextField id="last-name" label="Last Name" variant="outlined" fullWidth margin="normal"
+                    <TextField id="lastName" label="Last Name" variant="outlined" fullWidth margin="normal"
                         required
-                        error={fieldErrorText.lastName !== ""}
-                        helperText={fieldErrorText.lastName}
                         value={inputValues.lastName}
-                        onChange={(e) => changeInputValue("lastName", e.target.value)}
+                        onChange={changeInputValue}
+
+                        error={!!errors.lastName}
+                        helperText={errors.lastName}
                         />
-                    <TextField id="course" label="Course" variant="outlined" fullWidth  margin="normal"
+
+                        
+                    <TextField id="course" label="course" variant="outlined" fullWidth margin="normal"
                         select
                         required
                         value={inputValues.course}
-                        onChange={(e) => changeInputValue("course", e.target.value)}
-                        sx={{textAlign: 'left'}}
-                        SelectProps={{
-                            renderValue: (selected) => (
-                            <span>
-                                {handleCourse(selected, inputValues.course)}
-                            </span>
-                            ),
-                        }}>
+                        onChange={(e) => changeCourse(e.target.value)}
+
+                        error={!!errors.course}
+                        helperText={errors.course}
+                        
+
+                            SelectProps={{
+                                renderValue: (selected) => handleCourse(selected),
+                            }}
+                        >
+                        
                         {courseAcronyms.map((c, index) => (
                             <MenuItem value={c}>{courses[index]}</MenuItem>
                         ))}
-                    </TextField>
+                        </TextField>
+
+
+                    {/* <TextField id="course" label="Course" variant="outlined" fullWidth margin="normal"
+                        select
+                        required
+                        value={inputValues.course}
+                        onChange={changeInputValue}
+                        sx={{textAlign: 'left'}}
+                        error={!!errors.course}
+                        helperText={errors.course}>
+
+                        {courseAcronyms.map((c, index) => (
+                            <MenuItem value={c}>{courses[index]}</MenuItem>
+                        ))}
+                    </TextField> */}
 
                     {/*<TextField id="course" label="Course" variant="outlined" fullWidth margin="normal"
                         required
@@ -374,15 +464,17 @@ function AddStudents() {
 
                     <TextField id="year" label="Year" variant="outlined" fullWidth margin="normal"
                         required
-                        type="number"
+                        // type="number"
                         value={inputValues.year}
-                        error={fieldErrorText.year !== ""}
-                        helperText={fieldErrorText.year}
-                        onChange={(e) => changeInputValue("year", e.target.value)}
+                        onChange={changeInputValue}
                         inputProps={{ 
                             pattern: "[1-5]{1}"
                         }}
+
+                        error={!!errors.year}
+                        helperText={errors.year}
                         />
+
                     {/* <Button
                         type="submit"
                         variant="contained"
