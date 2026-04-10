@@ -5,7 +5,8 @@
     "middleName": "Veneracion",
     "lastName": "Balesteros",
     "course": "BSCE",
-    "year": "2"
+    "year": "2",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "5",
@@ -13,7 +14,8 @@
     "middleName": "Santos",
     "lastName": "Quintos",
     "course": "BSEE",
-    "year": "5"
+    "year": "5",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "11",
@@ -21,7 +23,8 @@
     "middleName": "Buenavista",
     "lastName": "Constantino",
     "course": "BSCS",
-    "year": "3"
+    "year": "3",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "36",
@@ -29,7 +32,8 @@
     "middleName": "Hernandez",
     "lastName": "Gallardo",
     "course": "BSEE",
-    "year": "2"
+    "year": "2",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "38",
@@ -37,7 +41,8 @@
     "middleName": "Zamora",
     "lastName": "Velasquez",
     "course": "BSCE",
-    "year": "3"
+    "year": "3",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "42",
@@ -45,7 +50,8 @@
     "middleName": "Garces",
     "lastName": "Valiente",
     "course": "BSEE",
-    "year": "1"
+    "year": "1",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "49",
@@ -53,7 +59,8 @@
     "middleName": "Navarro",
     "lastName": "Fernandez",
     "course": "BSMT",
-    "year": "2"
+    "year": "2",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "51",
@@ -61,7 +68,8 @@
     "middleName": "Molina",
     "lastName": "Ortega",
     "course": "BSEE",
-    "year": "3"
+    "year": "3",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "58",
@@ -69,7 +77,8 @@
     "middleName": "Castro",
     "lastName": "Ramos",
     "course": "BSCS",
-    "year": "1"
+    "year": "1",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "62",
@@ -77,7 +86,8 @@
     "middleName": "Delgado",
     "lastName": "Buenavista",
     "course": "BSCE",
-    "year": "2"
+    "year": "2",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "63",
@@ -85,7 +95,8 @@
     "middleName": "Martinez",
     "lastName": "Torres",
     "course": "BSCE",
-    "year": "2"
+    "year": "2",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "65",
@@ -93,7 +104,8 @@
     "middleName": "Castro",
     "lastName": "Romero",
     "course": "BSIT",
-    "year": "1"
+    "year": "1",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "68",
@@ -101,7 +113,8 @@
     "middleName": "Blanco",
     "lastName": "Buenaventura",
     "course": "BSEE",
-    "year": "4"
+    "year": "4",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "69",
@@ -109,7 +122,8 @@
     "middleName": "Concepcion",
     "lastName": "Vallador",
     "course": "BSMT",
-    "year": "2"
+    "year": "2",
+    "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
     "idNumber": "70",
@@ -117,6 +131,15 @@
     "middleName": "Montes",
     "lastName": "Acosta",
     "course": "BSIT",
-    "year": "4"
+    "year": "4",
+    "image": "http://localhost:1337/uploads/profile_default.png"
+  },
+  {
+    "idNumber": "77",
+    "firstName": "G",
+    "middleName": "G",
+    "lastName": "G",
+    "course": "BSGE",
+    "year": "3"
   }
 ]

@@ -5,6 +5,8 @@ const cors = require("cors");
 const fs = require("fs");
 const app = express();
 
+const port = 1337;
+
 app.use(cors());
 app.use(express.json());
 
@@ -12,24 +14,56 @@ app.use(express.json());
 //     res.send("Hello, world!");
 // });
 
+// =======================================================================
+const multer = require('multer');
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadPath = 'uploads/';
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath); 
+        }
+        cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
+// =======================================================================
 
 // add student
-app.post("/add-student", (req, res) => {
-    const newStudent = req.body;
-    fs.readFile("students.json", "utf-8", (err, data) => {
-        if (err) {
-            return res.status(500).send("Error reading file");
+app.post("/add-student", upload.single('image'), (req, res) => {
+    try {
+        const newStudent = req.body;
+
+        console.log(newStudent);
+        if (req.file) {
+            newStudent.image = `http://localhost:${port}/uploads/${req.file.filename}`;
+        } else {
+            newStudent.image = null;
         }
 
-        const student = JSON.parse(data);
-        student.push(newStudent);
-        fs.writeFile("students.json", JSON.stringify(student, null, 2), (err) => {
-            if (err) {
-                return res.status(500).send("Error writing file");
-            }
-            res.send("Student added successfully!");
+        fs.readFile("students.json", "utf8", (err, data) => {
+            if (err) return res.status(500).send("Error reading file");
+            
+            const students = JSON.parse(data || "[]");
+            const existing = students.find(s => s.idNumber === newStudent.idNumber);
+            if (existing) return res.status(400).send("Student ID already exists");
+
+            students.push(newStudent);
+            fs.writeFile("students.json", JSON.stringify(students, null, 2), (err) => {
+                if (err) return res.status(500).send("Error writing file");
+                res.send("Student added successfully!");
+            });
         });
-    });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Invalid data format");
+    }
 });
 
 // ========================
@@ -125,7 +159,7 @@ app.delete("/delete-user/:index", (req, res) => {
 });
 
 // edit student
-app.put("/edit-student/:index", (req, res) => {
+app.put("/edit-student/:index", upload.single('profileImage'), (req, res) => {
     const index = req.params.index;
     const updatedStudent = req.body;
 
@@ -138,6 +172,10 @@ app.put("/edit-student/:index", (req, res) => {
 
         if (students[index] === undefined) {
             return res.status(404).send("Student not found");
+        }
+        
+        if (req.file) {
+            updatedStudent.image = `http://localhost:${port}/uploads/${req.file.filename}`;
         }
 
         students[index] = updatedStudent;
@@ -164,11 +202,26 @@ app.delete("/delete-student/:index", (req, res) => {
         const students = JSON.parse(data);
 
         if (students[index] === undefined) {
-            return res.status(404).send("User not found");
+            return res.status(404).send("Student not found");
+        }
+
+        const defaultProfileImage = "http://localhost:1337/uploads/profile_default.png";
+        if (students[index].image && students[index].image !== defaultProfileImage) {
+            // Extract the filename from URL
+            const filename = students[index].image.split('/').pop();
+            const filePath = path.join(__dirname, 'uploads', filename);
+
+            // Delete the file from uploads
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error("Failed to delete local file:", err);
+                } else {
+                    console.log(`Successfully deleted image: ${filename}`);
+                }
+            });
         }
 
         students.splice(index, 1);
-        // users[index] = updatedUser;
 
         fs.writeFile("students.json", JSON.stringify(students, null, 2), (err) => {
             if (err) {
@@ -195,7 +248,6 @@ app.get("/students", (req, res) => {
 });
 
 // ========================
-const port = 1337;
 
 app.listen(port, () => {
     console.log(`Server running on ${port}`);

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper,
+    Paper, Avatar,
 
     Box,
     TextField, Button,
@@ -12,6 +12,7 @@ import {
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
 function AddStudents() {
+    const [errors, setErrors] = useState([]); 
 
     const emptyStudentInfo = {
         idNumber: "",
@@ -19,13 +20,62 @@ function AddStudents() {
         middleName: "",
         lastName: "",
         course: "",
-        year: ""};
+        year: "",
+        image: null};
+
+
+    const validate = () => {
+        let tempErrors = emptyStudentInfo;
+
+        if (inputValues.idNumber.trim() === "") {
+            tempErrors.idNumber = "Field is required";
+        } else if (!/^\d+$/.test(inputValues.idNumber)) {
+            tempErrors.idNumber = "Must be a whole number";
+        }   
+
+        if (inputValues.firstName.trim() === "") {
+            tempErrors.firstName = "Field is required";
+        } else if (!/^[A-Za-z\s-]+$/.test(inputValues.firstName)) {
+            tempErrors.firstName = "Can only contain letters, spaces, and dash";
+        }
+
+        if (!/^[A-Za-z\s-]+$/.test(inputValues.middleName)) {
+            tempErrors.middleName = "Can only contain letters, spaces, and dash";
+        }
+
+        
+        if (inputValues.lastName.trim() === "") {
+            tempErrors.lastName = "Field is required";
+        } else if (!/^[A-Za-z\s-]+$/.test(inputValues.lastName)) {
+            tempErrors.lastName = "Can only contain letters, spaces, and dash";
+        }
+
+        if (inputValues.course.trim() === "") {
+            tempErrors.course = "Field is required";
+        }
+
+        if (inputValues.year.trim() === "") {
+            tempErrors.year = "Field is required";
+        } else if (!/^[1-5]$/.test(inputValues.year)) {
+            tempErrors.year = "Must be an integer between 1 and 5";
+        }
+
+        setErrors(tempErrors);
+        
+        return Object.keys(tempErrors).length === 0;
+    };
 
     const [inputValues, setInputValues] = useState(emptyStudentInfo);
     const [fieldErrorText, setFieldErrorText] = useState(emptyStudentInfo);
+    const [imageUrl, setImageUrl] = useState("");
+    
+
+    const [preview, setPreview] = useState(null);
 
     const [editIndex, setEditIndex] = useState(null);
     const [students, setStudents] = useState([]);
+
+    const [currentStudentInfo, setCurrentStudentInfo] = useState(emptyStudentInfo);
     
     // ==============
     // Delete Dialog
@@ -94,18 +144,21 @@ function AddStudents() {
     }
     // ==============
 
-    const changeInputValue = (key, value) => {
-        if (key === "idNumber") {
-            value = value.replace(/\D/g, ''); 
-        }
 
-        setInputValues(prevInputValue => ({
-            ...prevInputValue,
-            [key]: value
-        }));
+    // ==============
+
+    // const changeInputValue = (key, value) => {
+    //     if (key === "idNumber") {
+    //         value = value.replace(/\D/g, ''); 
+    //     }
+
+    //     setInputValues(prevInputValue => ({
+    //         ...prevInputValue,
+    //         [key]: value
+    //     }));
         
-        displayEmptyError(key, value);
-    };
+    //     displayEmptyError(key, value);
+    // };
     
     const displayEmptyError = (key, value) => {
         if (key === "middleName") {
@@ -191,27 +244,39 @@ function AddStudents() {
     }
 
     async function handleAddStudent() {
+        if (validate()) {
+            //console.log("Form Data:", form);
+            return;
+        }
         try {
-            // if (!noInputErrors()) {
-            //     clearStudentInfo();
-            //     alert("Fix all errors   .");
-            //     return;
-            // }
-            await axios.post("http://localhost:1337/add-student", {
+            const studentToAdd = {
                 idNumber: inputValues.idNumber,
                 firstName: inputValues.firstName,
                 middleName: inputValues.middleName,
                 lastName: inputValues.lastName,
                 course: inputValues.course,
                 year: inputValues.year
-            });
-            displayStudentInfo();
+            }
+            if (inputValues.image) {
+                studentToAdd["image"] = inputValues.image;
+            }
+            await axios.post("http://localhost:1337/add-student",
+                studentToAdd, {
+                    headers: { "Content-Type": "multipart/form-data" }
+                }
+            );
+
+            alert("Ran");
+            //displayStudentInfo();
+            setCurrentStudentInfo(studentToAdd);
+
             alert("Student added!");
             fetchStudents();
             clearInputFields();
 
         } catch (error) {
             console.error(error)
+            alert(error);
         }
     }
 
@@ -231,18 +296,37 @@ function AddStudents() {
         fetchStudents();
     }, []);
 
+    useEffect(() => {
+        return () => {
+            if (preview) URL.revokeObjectURL(preview);
+        };
+    }, [preview]);
+
 
     async function handleUpdateStudent() {
         try {
-            await axios.put(`http://localhost:1337/edit-student/${editIndex}`,{
+
+            const studentToUpdate = {
                 idNumber: inputValues.idNumber,
                 firstName: inputValues.firstName,
                 middleName: inputValues.middleName,
                 lastName: inputValues.lastName,
                 course: inputValues.course,
-                year: inputValues.year,
-            });
-            displayStudentInfo();
+                year: inputValues.year
+            }
+
+            if (inputValues.image) {
+                studentToUpdate["image"] = inputValues.image;
+            }
+
+            await axios.put(`http://localhost:1337/edit-student/${editIndex}`,
+                studentToUpdate,{
+                    headers: { "Content-Type": "multipart/form-data" }
+                }
+            );
+
+            setCurrentStudentInfo(studentToUpdate);
+            
             alert("Student updated!");
             fetchStudents();
             clearInputFields();
@@ -264,17 +348,48 @@ function AddStudents() {
         setEditIndex(index);
     }
 
-    function handleCourse(condition, value) {
-        if (condition === "BLIS") {
-            return "Bachelor in " + courses[courseAcronyms.indexOf(value)];
+
+    
+    function handleCourse(selected) {
+        if (inputValues.course === "BLIS") {
+            return "Bachelor in " + courses[courseAcronyms.indexOf(selected)];
         } else {
-            return "Bachelor of Science in " + courses[courseAcronyms.indexOf(value)];
+            return "Bachelor of Science in " + courses[courseAcronyms.indexOf(selected)];
         }
+        
     }
 
+    const changeInputValue = (e) => {
+        const { id, value, files } = e.target;
 
+        //alert(value + ", course: " + inputValues.course);
 
+        if (id === "image") { 
+            const file = files[0];
 
+            setInputValues({
+                ...inputValues,
+                image: file
+            });
+            
+            if (file) {
+                setPreview(URL.createObjectURL(file));
+            }
+
+        } else {
+            setInputValues({
+                ...inputValues,
+                [e.target.id]: e.target.value
+            });
+        }
+    };
+    
+    const changeCourse = (value) => {
+        setInputValues(prevInputValue => ({
+            ...prevInputValue,
+            course: value
+        }));
+    };
 
     return (
         <>
@@ -307,7 +422,7 @@ function AddStudents() {
                 elevation={3}
                 sx={{
                     padding: 4,
-                    width: 600
+                    width: '740px'
                 }}
             >
                 <h2>Add Student</h2>
@@ -316,73 +431,103 @@ function AddStudents() {
                     // onSubmit={handleAddStudent}
                     >
 
-                    <TextField id="id-number" label="ID Number" variant="outlined" fullWidth margin="normal"
+                    <TextField id="idNumber" label="ID Number" variant="outlined" fullWidth margin="normal"
                         required
-                        type="number"
-                        error={fieldErrorText.idNumber !== ""}
-                        helperText={fieldErrorText.idNumber}
+                        // type="number"
                         value={inputValues.idNumber}
-                        onChange={(e) => changeInputValue("idNumber", e.target.value)}
-                        InputProps={{ inputProps: { min: 1 } }}
+                        onChange={changeInputValue}
+
+                        error={!!errors.idNumber}
+                        helperText={errors.idNumber}
                         />
 
-                    <TextField id="first-name" label="First Name" variant="outlined" fullWidth margin="normal"
+                    <TextField id="firstName" label="First Name" variant="outlined" fullWidth margin="normal"
                         required
-                        error={fieldErrorText.firstName !== ""}
-                        helperText={fieldErrorText.firstName}
                         value={inputValues.firstName}
-                        onChange={(e) => changeInputValue("firstName", e.target.value)}
+                        onChange={changeInputValue}
+                        
+                        error={!!errors.firstName}
+                        helperText={errors.firstName}
                         />
 
-                    <TextField id="middle-name" label="Middle Name" variant="outlined" fullWidth
+                    <TextField id="middleName" label="Middle Name" variant="outlined" fullWidth
                         value={inputValues.middleName}
-                        onChange={(e) => changeInputValue("middleName", e.target.value)}
+                        onChange={changeInputValue}
+                        
+                        error={!!errors.middleName}
+                        helperText={errors.middleName}
                         />
 
-                    <TextField id="last-name" label="Last Name" variant="outlined" fullWidth margin="normal"
+                    <TextField id="lastName" label="Last Name" variant="outlined" fullWidth margin="normal"
                         required
-                        error={fieldErrorText.lastName !== ""}
-                        helperText={fieldErrorText.lastName}
                         value={inputValues.lastName}
-                        onChange={(e) => changeInputValue("lastName", e.target.value)}
+                        onChange={changeInputValue}
+
+                        error={!!errors.lastName}
+                        helperText={errors.lastName}
                         />
-                    <TextField id="course" label="Course" variant="outlined" fullWidth  margin="normal"
+
+                        
+                    <TextField id="course" label="Course" variant="outlined" fullWidth margin="normal"
                         select
                         required
                         value={inputValues.course}
-                        onChange={(e) => changeInputValue("course", e.target.value)}
-                        sx={{textAlign: 'left'}}
-                        SelectProps={{
-                            renderValue: (selected) => (
-                            <span>
-                                {handleCourse(selected, inputValues.course)}
-                            </span>
-                            ),
-                        }}>
-                        {courseAcronyms.map((c, index) => (
-                            <MenuItem value={c}>{courses[index]}</MenuItem>
-                        ))}
-                    </TextField>
+                        onChange={(e) => changeCourse(e.target.value)}
 
-                    {/*<TextField id="course" label="Course" variant="outlined" fullWidth margin="normal"
-                        required
-                        error={fieldErrorText.course !== ""}
-                        helperText={fieldErrorText.course}
-                        value={inputValues.course}
-                        onChange={(e) => changeInputValue("course", e.target.value)}
-                        />*/}
+                        error={!!errors.course}
+                        helperText={errors.course}
+                                sx={{textAlign: 'left'}}
+                        
+
+                            SelectProps={{
+                                renderValue: (selected) => handleCourse(selected),
+                            }}
+                        >
+                        
+                        {courseAcronyms.map((c, index) => (
+                            <MenuItem
+                                value={c}
+                                >{courses[index]}</MenuItem>
+                        ))}
+                        </TextField>
 
                     <TextField id="year" label="Year" variant="outlined" fullWidth margin="normal"
                         required
-                        type="number"
+                        // type="number"
                         value={inputValues.year}
-                        error={fieldErrorText.year !== ""}
-                        helperText={fieldErrorText.year}
-                        onChange={(e) => changeInputValue("year", e.target.value)}
+                        onChange={changeInputValue}
                         inputProps={{ 
                             pattern: "[1-5]{1}"
                         }}
+
+                        error={!!errors.year}
+                        helperText={errors.year}
                         />
+
+                    {preview && (
+                        <Box sx={{ mt: 2 }}>
+                            <Typography>Image Preview:</Typography>
+                            <img
+                            src={preview}
+                            alt="preview"
+                            style={{ width: "100%", maxHeight: 200, objectFit: "cover" }}
+                            />
+                        </Box>
+                    )}
+
+                    <Button variant="contained" component="label"
+                        sx={{ mt: 2 }}>
+                        Upload Image
+                        <input
+                            id="image" 
+                            type="file"
+                            name="image"
+                            hidden
+                            accept="image/*"
+                            onChange={changeInputValue}
+                        />
+                    </Button>
+
                     {/* <Button
                         type="submit"
                         variant="contained"
@@ -402,26 +547,41 @@ function AddStudents() {
                     sx={{
                         padding: 4,
                         marginTop: 3
-                    }}>
-                    <h2>Student Preview</h2>
-                    <table style={{ textAlign: "left" }}>
-                        <tr>
-                            <td>ID:</td>
-                            <td id="preview-id"></td>
-                        </tr>
-                        <tr>
-                            <td>Name:</td>
-                            <td id="preview-name"></td>
-                        </tr>
-                        <tr>
-                            <td>Course:</td>
-                            <td id="preview-course"></td>
-                        </tr>
-                        <tr>
-                            <td>Year:</td>
-                            <td id="preview-year"></td>
-                        </tr>
-                    </table>
+                    }}
+                >
+                    <Table>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>ID:</TableCell>
+                                <TableCell
+                                    align="left">
+                                    {currentStudentInfo.idNumber}
+                                    </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Name:</TableCell>
+                                <TableCell
+                                    align="left">
+                                    {currentStudentInfo.firstName}
+                                    </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Course:</TableCell>
+                                <TableCell
+                                    align="left">
+                                    {currentStudentInfo.course}
+                                    </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Year:</TableCell>
+                                <TableCell
+                                    align="left">
+                                    {currentStudentInfo.year}
+                                    </TableCell>
+                            </TableRow>
+
+                        </TableBody>
+                    </Table>
                 </Paper>
             </Paper>
             <TableContainer
@@ -447,6 +607,7 @@ function AddStudents() {
                     <TableBody>
                         {students.map((student, index) => (
                             <TableRow key={index}>
+                                <TableCell><Avatar src={student.image}/></TableCell>
                                 <TableCell>{student.idNumber}</TableCell>
                                 <TableCell>{student.firstName}</TableCell>
                                 <TableCell>{student.middleName}</TableCell>
