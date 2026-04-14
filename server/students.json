@@ -135,11 +135,39 @@
     "image": "http://localhost:1337/uploads/profile_default.png"
   },
   {
-    "idNumber": "77",
-    "firstName": "G",
-    "middleName": "G",
-    "lastName": "G",
+    "idNumber": "2",
+    "firstName": "Severino",
+    "middleName": "Hidalgo",
+    "lastName": "Reyes",
     "course": "BSGE",
-    "year": "3"
+    "year": "2",
+    "image": null
+  },
+  {
+    "idNumber": "4",
+    "firstName": "Severino",
+    "middleName": "Morales",
+    "lastName": "Zanora",
+    "course": "BSMATH",
+    "year": "2",
+    "image": null
+  },
+  {
+    "idNumber": "71",
+    "firstName": "s",
+    "middleName": "s",
+    "lastName": "s",
+    "course": "BSCP",
+    "year": "3",
+    "image": null
+  },
+  {
+    "idNumber": "72",
+    "firstName": "qq-",
+    "middleName": "q",
+    "lastName": "q",
+    "course": "BSAR",
+    "year": "5",
+    "image": null
   }
 ]

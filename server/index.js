@@ -37,19 +37,17 @@ const upload = multer({ storage: storage });
 
 
 // ===================================================
-const multer = require("multer");
+// app.use("/uploads", express.static("uploads"));
 
-app.use("/uploads", express.static("uploads"));
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName);
-  }
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "uploads/");
+//   },
+//   filename: (req, file, cb) => {
+//     const uniqueName = Date.now() + "-" + file.originalname;
+//     cb(null, uniqueName);
+//   }
+// });
 
 // File filter (images only)
 const fileFilter = (req, file, cb) => {
@@ -60,7 +58,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ storage, fileFilter });
+// const upload = multer({ storage, fileFilter });
 
 app.post("/api/form", upload.single("image"), (req, res) => {
   const { id, name, category } = req.body;

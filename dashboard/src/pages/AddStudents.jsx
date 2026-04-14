@@ -4,7 +4,7 @@ import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, Avatar,
 
-    Box,
+    Box, Stack,
     TextField, Button,
     Select, MenuItem, InputLabel,
     Typography
@@ -23,31 +23,35 @@ function AddStudents() {
         year: "",
         image: null};
 
-
     const validate = () => {
-        let tempErrors = emptyStudentInfo;
+        let tempErrors = {};
 
         if (inputValues.idNumber.trim() === "") {
             tempErrors.idNumber = "Field is required";
-        } else if (!/^\d+$/.test(inputValues.idNumber)) {
-            tempErrors.idNumber = "Must be a whole number";
-        }   
+        } else if (isNaN(inputValues.idNumber)) {
+            tempErrors.idNumber = "Must be number";
+        } else if (Number(inputValues.idNumber) < 1) {
+            tempErrors.idNumber = "Must be positive";
+        } if (students.some(item => item.idNumber === inputValues.idNumber)) {
+            tempErrors.idNumber = "ID already exists";
+        }
 
         if (inputValues.firstName.trim() === "") {
             tempErrors.firstName = "Field is required";
-        } else if (!/^[A-Za-z\s-]+$/.test(inputValues.firstName)) {
-            tempErrors.firstName = "Can only contain letters, spaces, and dash";
+        } else if (!/^[A-Za-zÀ-ÿ\s-]+$/.test(inputValues.firstName)) {
+            tempErrors.firstName = "Can only be letters, spaces, and dash";
         }
 
-        if (!/^[A-Za-z\s-]+$/.test(inputValues.middleName)) {
-            tempErrors.middleName = "Can only contain letters, spaces, and dash";
+        if (inputValues.middleName.trim() === "") {}
+        else if (!/^[A-Za-zÀ-ÿ\s-]+$/.test(inputValues.middleName)) {
+            tempErrors.middleName = "Can blank or only be letters, spaces, and dash";
         }
 
         
         if (inputValues.lastName.trim() === "") {
             tempErrors.lastName = "Field is required";
-        } else if (!/^[A-Za-z\s-]+$/.test(inputValues.lastName)) {
-            tempErrors.lastName = "Can only contain letters, spaces, and dash";
+        } else if (!/^[A-Za-zÀ-ÿ\s-]+$/.test(inputValues.lastName)) {
+            tempErrors.lastName = "Can only be letters, spaces, and dash";
         }
 
         if (inputValues.course.trim() === "") {
@@ -57,10 +61,10 @@ function AddStudents() {
         if (inputValues.year.trim() === "") {
             tempErrors.year = "Field is required";
         } else if (!/^[1-5]$/.test(inputValues.year)) {
-            tempErrors.year = "Must be an integer between 1 and 5";
+            tempErrors.year = "Must be from 1 to 5";
         }
-
         setErrors(tempErrors);
+        
         
         return Object.keys(tempErrors).length === 0;
     };
@@ -205,8 +209,8 @@ function AddStudents() {
     }
     
     function clearInputFields() {
-        setInputValues(prevValues => (emptyStudentInfo));
-        setFieldErrorText(prevValues => (emptyStudentInfo))
+        setInputValues(emptyStudentInfo);
+        setFieldErrorText(emptyStudentInfo)
         setEditIndex(null);
     }
     
@@ -244,7 +248,7 @@ function AddStudents() {
     }
 
     async function handleAddStudent() {
-        if (validate()) {
+        if (!validate()) {
             //console.log("Form Data:", form);
             return;
         }
@@ -266,7 +270,7 @@ function AddStudents() {
                 }
             );
 
-            alert("Ran");
+            //alert("Ran");
             //displayStudentInfo();
             setCurrentStudentInfo(studentToAdd);
 
@@ -276,7 +280,7 @@ function AddStudents() {
 
         } catch (error) {
             console.error(error)
-            alert(error);
+            //alert(error);
         }
     }
 
@@ -422,7 +426,7 @@ function AddStudents() {
                 elevation={3}
                 sx={{
                     padding: 4,
-                    width: '740px'
+                    maxWidth: '450px'
                 }}
             >
                 <h2>Add Student</h2>
@@ -515,18 +519,19 @@ function AddStudents() {
                         </Box>
                     )}
 
-                    <Button variant="contained" component="label"
-                        sx={{ mt: 2 }}>
-                        Upload Image
-                        <input
-                            id="image" 
-                            type="file"
-                            name="image"
-                            hidden
-                            accept="image/*"
-                            onChange={changeInputValue}
-                        />
-                    </Button>
+                    <Stack spacing="5px">
+                        <Button variant="contained" component="label"
+                            sx={{ mt: 2 }}>
+                            Upload Image
+                            <input
+                                id="image" 
+                                type="file"
+                                name="image"
+                                hidden
+                                accept="image/*"
+                                onChange={changeInputValue}
+                            />
+                        </Button>
 
                     {/* <Button
                         type="submit"
@@ -537,11 +542,12 @@ function AddStudents() {
                         Login
                     </Button> */}
 
-                {editIndex === null ? (
-                    <Button variant="contained" color="primary" onClick={handleAddStudent}>Add Student</Button>
-                ) : (
-                    <Button variant="contained" color="primary" onClick={handleUpdateStudent}>Update Student</Button>
-                )}
+                        {editIndex === null ? (
+                            <Button variant="contained" color="primary" onClick={handleAddStudent}>Add Student</Button>
+                        ) : (
+                            <Button variant="contained" color="primary" onClick={handleUpdateStudent}>Update Student</Button>
+                        )}
+                    </Stack>
                 </form>
                 <Paper
                     sx={{
@@ -588,19 +594,22 @@ function AddStudents() {
                 component={Paper}
                 sx={{
                     height: "90vh",
-                    overflow: "auto"
+                    overflowY: "auto",
+                    width: '1200px',
+                    maxWidth: '1200px',
                 }}
             >
                 <Table stickyHeader>
                     <TableHead>
                         <TableRow>
+                            <TableCell></TableCell>
                             <TableCell>ID</TableCell>
                             <TableCell>First Name</TableCell>
                             <TableCell>Middle Name</TableCell>
                             <TableCell>Last Name</TableCell>
                             <TableCell>Course</TableCell>
                             <TableCell>Year</TableCell>
-                            <TableCell></TableCell>
+                            <TableCell align="center">Actions</TableCell>
                         </TableRow>
                     </TableHead>
 
