@@ -4,16 +4,77 @@ const express =require("express");
 const cors = require("cors");
 const fs = require("fs");
 const app = express();
+const mongoose = require("mongoose");
+
+const User = require("./model/user.model");
 
 const port = 1337;
 
 app.use(cors());
 app.use(express.json());
 
+mongoose
+    .connect("mongodb://127.0.0.1:27017/SIS-db")
+    .then(() => console.log("Connected to MongoDB"))
+    .catch((err) => console.error("Connection error: ", err));
+
 // app.get("/", (req, res) => {
 //     res.send("Hello, world!");
 // });
 
+// =======================================================================
+
+app.post("/add-user-db", async (req, res) => {
+    const {name, email, password } = req.body;
+    try {
+        const newUser = User({name, email, password});
+        await newUser.save();
+        res.status(201).json({ message: "User added successfully!" })
+
+    } catch (error) {
+        console.error("Error adding user to database: ", error);
+        res.status(500).json({ message: "Error adding user to database" });
+    }
+})
+
+app.get("/users-db", async (req, res) => {
+    try {
+        const users = await User.find();
+        res.status(200).json(users);
+    } catch (error) {
+        console.error("Error fetching users from database: ", error);
+        res.status(500).json({ message: "Error fetching users from database" });
+    }
+});
+
+app.put("/edit-user-db/:id", async (req, res) => {
+    const { id } = req.params;
+    const { name, email, password } = req.body;
+    try {
+        const updatedUser = await User.findByIdAndUpdate(id, { name, email, password }, { new: true });
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({ message: "User updated successfully!", user: updatedUser });
+    } catch (error) {
+        console.error("Error updating user in database: ", error);
+        res.status(500).json({ message: "Error updating user in database" });
+    }
+});
+
+app.delete("/delete-user-db/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+        const deletedUser = await User.findByIdAndDelete(id);
+        if (!deletedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({ message: "User deleted successfully!" });
+    } catch (error) {
+        console.error("Error deleting user from database: ", error);
+        res.status(500).json({ message: "Error deleting user from database" });
+    }
+});
 // =======================================================================
 const multer = require('multer');
 const path = require('path');

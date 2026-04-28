@@ -18,6 +18,7 @@ function Users() {
         const [open, setOpen] = useState(false);
 
         const handleDeleteDialogOpen = (index) => {
+            alert("Index: " + index);
             setEditIndex(index);
             setOpen(true);
         };
@@ -34,7 +35,7 @@ function Users() {
 
     function fetchUsers() {
         axios
-            .get("http://localhost:1337/users")
+            .get("http://localhost:1337/users-db")
             .then((response) => {
                 setUsers(response.data);
                 console.log(response.data);
@@ -50,7 +51,7 @@ function Users() {
 
     async function handleAddUser() {
         try {
-            await axios.post("http://localhost:1337/add-user", {
+            await axios.post("http://localhost:1337/add-user-db", {
                 name: name,
                 email: email,
                 password: password
@@ -66,7 +67,7 @@ function Users() {
 
     async function handleUpdateUser() {
         try {
-            await axios.put(`http://localhost:1337/edit-user/${editIndex}`,{
+            await axios.put(`http://localhost:1337/edit-user-db/${editIndex}`,{
                 name: name,
                 email: email,
                 password: password,
@@ -81,7 +82,7 @@ function Users() {
 
     async function handleDeleteUser(index) {
         try {
-            await axios.delete(`http://localhost:1337/delete-user/${index}`,{
+            await axios.delete(`http://localhost:1337/delete-user-db/${index}`,{
                 name: name,
                 email: email,
                 password: password,
@@ -165,7 +166,7 @@ function Users() {
 
                 {users.map((user, index) => (
                     <TableBody>
-                        <TableRow key={index}>
+                        <TableRow key={user._id}>
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.password}</TableCell>
@@ -174,7 +175,7 @@ function Users() {
                                     display: "flex",
                                     gap: "12px"
                                 }}>
-                                <Button variant="outlined" onClick={() => handleEdit(user, index)}>Edit</Button>
+                                <Button variant="outlined" onClick={() => handleEdit(user, user._id)}>Edit</Button>
                                 <Button variant="outlined"
                                     sx={{
                                         borderColor: "red",
@@ -183,7 +184,7 @@ function Users() {
                                             backgroundColor: '#f1ebeb'
                                         },
                                     }}
-                                    onClick={() => handleDeleteDialogOpen(index)}
+                                    onClick={() => handleDeleteDialogOpen(user._id)}
                                     >Delete</Button>
                             </TableCell>
                             
